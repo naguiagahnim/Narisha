@@ -1,0 +1,10 @@
+version = 1
+
+[[annotations]]
+SPDX-FileCopyrightText = "© 2026 Kirill Primak"
+SPDX-License-Identifier = "0BSD"
+path = "**/*"
+
+[[annotations]]
+SPDX-License-Identifier = "MIT"
+path = "protocol/wayland.xml"
