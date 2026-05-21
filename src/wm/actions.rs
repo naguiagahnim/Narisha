@@ -14,6 +14,7 @@ pub enum Action {
     Move,
     Resize,
     Exit,
+    Fullscreen,
 }
 
 #[derive(Debug, Clone)]
@@ -49,6 +50,11 @@ impl Seat {
                 Ok(_) => {}
                 Err(e) => eprintln!("Failed to spawn process: {e}"),
             },
+            Action::Fullscreen => {
+                if let Some(window_proxy) = self.focused.as_ref() {
+                    // window_proxy.fullscreen(window_proxy.get);
+                }
+            }
             Action::Close => {
                 if let Some(window_proxy) = self.focused.as_ref() {
                     window_proxy.close();
