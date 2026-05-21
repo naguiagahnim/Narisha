@@ -1,5 +1,5 @@
 pub mod actions;
-pub mod binds;
+pub mod bindings;
 pub mod layout;
 
 use std::collections::{HashMap, VecDeque};
