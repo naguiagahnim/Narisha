@@ -1,20 +1,15 @@
-<!--
-SPDX-FileCopyrightText: © 2026 Julian Andrews
-SPDX-License-Identifier: 0BSD
--->
+# Narisha
+Le README servira de projet le temps de migrer sur Forgejo
 
-# tinyrwm.rust
+# TODO
+## Plus important
+- Gestion des fenêtres (scrolling)
+- Keybinds
 
-Tiny river window manager implemented in Rust.
+## Moins important
+- Animations, shaders
+- Effets sonores
 
-## Building
+## Encore moins important
+- Déserialization fichiers de configuration
 
-```sh
-cargo build --release
-```
-
-## Running
-
-```
-river -c ./target/release/tinyrwm
-```

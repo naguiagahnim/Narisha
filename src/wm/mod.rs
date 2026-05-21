@@ -145,7 +145,13 @@ impl WindowManager {
 
         for seat in self.seats.values_mut() {
             if seat.new {
-                seat.create_xkb_binding(river_xkb, qh, mods, SPACE, Action::SpawnKitty);
+                seat.create_xkb_binding(
+                    river_xkb,
+                    qh,
+                    mods,
+                    SPACE,
+                    Action::Spawn(vec!["kitty".to_string()]),
+                );
                 seat.create_xkb_binding(river_xkb, qh, mods, Q, Action::Close);
                 seat.create_xkb_binding(river_xkb, qh, mods, N, Action::FocusNext);
                 seat.create_xkb_binding(river_xkb, qh, mods, ESC, Action::Exit);

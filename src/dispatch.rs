@@ -146,9 +146,8 @@ impl Dispatch<RiverOutputV1, ()> for AppData {
             .outputs
             .get_mut(&proxy.id())
             .expect("Output not found");
-        match event {
-            Event::Removed => output.removed = true,
-            _ => {}
+        if let Event::Removed = event {
+            output.removed = true
         }
     }
 }
@@ -191,9 +190,8 @@ impl Dispatch<RiverXkbBindingV1, ObjectId> for AppData {
             .xkb_bindings
             .get(&proxy.id())
             .expect("xkb_binding not found");
-        match event {
-            Event::Pressed => seat.pending_action = binding.action,
-            _ => {}
+        if let Event::Pressed = event {
+            seat.pending_action = binding.action.clone()
         }
     }
 }
@@ -213,9 +211,8 @@ impl Dispatch<RiverPointerBindingV1, ObjectId> for AppData {
             .pointer_bindings
             .get(&proxy.id())
             .expect("pointer_binding not found");
-        match event {
-            Event::Pressed => seat.pending_action = binding.action,
-            _ => {}
+        if let Event::Pressed = event {
+            seat.pending_action = binding.action.clone()
         }
     }
 }

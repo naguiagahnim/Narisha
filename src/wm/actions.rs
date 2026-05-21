@@ -4,10 +4,10 @@ use crate::river::river_window_manager_v1::RiverWindowManagerV1;
 use crate::river::river_window_v1::{Edges, RiverWindowV1};
 use crate::state::{Seat, Window};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Action {
     None,
-    SpawnKitty,
+    Spawn(Vec<String>),
     Close,
     FocusNext,
     Move,
@@ -35,14 +35,15 @@ pub enum SeatOp {
 
 impl Seat {
     pub fn do_action(&mut self, windows: &mut VecDeque<Window>, wm_proxy: &RiverWindowManagerV1) {
-        match self.pending_action {
+        match &self.pending_action {
             Action::None => {}
-            Action::SpawnKitty => match std::process::Command::new("kitty")
+            Action::Spawn(cmd) => match std::process::Command::new(&cmd[0])
+                .args(&cmd[1..])
                 .env_remove("WAYLAND_DEBUG")
                 .spawn()
             {
                 Ok(_) => {}
-                Err(e) => eprintln!("Failed to spawn kitty: {e}"),
+                Err(e) => eprintln!("Failed to spawn process: {e}"),
             },
             Action::Close => {
                 if let Some(window_proxy) = self.focused.as_ref() {
