@@ -1,4 +1,6 @@
-{pkgs ? import <nixpkgs> {}}:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 pkgs.mkShell {
   packages = with pkgs; [
     cargo
@@ -7,5 +9,7 @@ pkgs.mkShell {
     rustfmt
     clippy
     river
+    taplo
+    treefmt
   ];
 }
