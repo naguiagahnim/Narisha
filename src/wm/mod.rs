@@ -22,6 +22,29 @@ pub struct WindowManager {
     pub seats: HashMap<ObjectId, Seat>,
 }
 
+// Keybinds
+// https://github.com/xkbcommon/libxkbcommon/blob/master/include/xkbcommon/xkbcommon-keysyms.h
+//
+// Input events
+// https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h
+
+#[repr(u32)]
+enum Keys {
+    // Keyboard
+    Space = 0x20,
+    N = 0x6e,
+    Q = 0x71,
+    Esc = 0xff1b,
+    Left = 0xff51,
+    Right = 0xff53,
+    Up = 0xff52,
+    Down = 0xff54,
+
+    // Mouse and others
+    MouseLeft = 0x110,
+    MouseRight = 0x111,
+}
+
 impl WindowManager {
     pub fn handle_manage_start(
         &mut self,
@@ -53,6 +76,7 @@ impl WindowManager {
                         window.set_position(start_x + seat.op_dx, start_y + seat.op_dy);
                     }
                 }
+                SeatOp::Spawn { window_proxy } => (),
                 SeatOp::Resize {
                     window_proxy,
                     start_x,
@@ -97,10 +121,9 @@ impl WindowManager {
                     for seat in self.seats.values_mut() {
                         if let SeatOp::Move { window_proxy, .. }
                         | SeatOp::Resize { window_proxy, .. } = &seat.op
+                            && window_proxy == &window.proxy
                         {
-                            if window_proxy == &window.proxy {
-                                seat.op_end();
-                            }
+                            seat.op_end();
                         }
                     }
                     return false;
@@ -135,12 +158,6 @@ impl WindowManager {
     }
 
     fn init_new_seats(&mut self, river_xkb: &RiverXkbBindingsV1, qh: &QueueHandle<AppData>) {
-        const SPACE: u32 = 0x20;
-        const N: u32 = 0x6e;
-        const Q: u32 = 0x71;
-        const ESC: u32 = 0xff1b;
-        const BTN_LEFT: u32 = 0x110;
-        const BTN_RIGHT: u32 = 0x111;
         let mods = Modifiers::Mod4;
 
         for seat in self.seats.values_mut() {
@@ -149,14 +166,21 @@ impl WindowManager {
                     river_xkb,
                     qh,
                     mods,
-                    SPACE,
+                    Keys::Space as u32,
                     Action::Spawn(vec!["kitty".to_string()]),
                 );
-                seat.create_xkb_binding(river_xkb, qh, mods, Q, Action::Close);
-                seat.create_xkb_binding(river_xkb, qh, mods, N, Action::FocusNext);
-                seat.create_xkb_binding(river_xkb, qh, mods, ESC, Action::Exit);
-                seat.create_pointer_binding(qh, mods, BTN_LEFT, Action::Move);
-                seat.create_pointer_binding(qh, mods, BTN_RIGHT, Action::Resize);
+                seat.create_xkb_binding(river_xkb, qh, mods, Keys::Q as u32, Action::Close);
+                seat.create_xkb_binding(
+                    river_xkb,
+                    qh,
+                    mods,
+                    Keys::Right as u32,
+                    Action::FocusRight,
+                );
+                seat.create_xkb_binding(river_xkb, qh, mods, Keys::Left as u32, Action::FocusLeft);
+                seat.create_xkb_binding(river_xkb, qh, mods, Keys::Esc as u32, Action::Exit);
+                seat.create_pointer_binding(qh, mods, Keys::MouseLeft as u32, Action::Move);
+                seat.create_pointer_binding(qh, mods, Keys::MouseRight as u32, Action::Resize);
                 seat.new = false;
             }
         }

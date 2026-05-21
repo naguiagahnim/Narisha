@@ -9,7 +9,8 @@ pub enum Action {
     None,
     Spawn(Vec<String>),
     Close,
-    FocusNext,
+    FocusRight,
+    FocusLeft,
     Move,
     Resize,
     Exit,
@@ -22,6 +23,9 @@ pub enum SeatOp {
         window_proxy: RiverWindowV1,
         start_x: i32,
         start_y: i32,
+    },
+    Spawn {
+        window_proxy: RiverWindowV1,
     },
     Resize {
         window_proxy: RiverWindowV1,
@@ -50,10 +54,15 @@ impl Seat {
                     window_proxy.close();
                 }
             }
-            Action::FocusNext => {
+            Action::FocusRight => {
                 windows.rotate_left(1);
                 self.focus_top(windows);
             }
+            Action::FocusLeft => {
+                windows.rotate_right(1);
+                self.focus_top(windows);
+            }
+
             Action::Move => {
                 if let (Some(window_proxy), SeatOp::None) = (self.hovered.as_ref(), &self.op) {
                     let window = windows
