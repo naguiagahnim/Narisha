@@ -5,7 +5,7 @@ use std::collections::{HashMap, VecDeque};
 use std::fmt::Debug;
 
 use wayland_backend::client::ObjectId;
-use wayland_client::{protocol::wl_registry, Connection, Dispatch, Proxy, QueueHandle};
+use wayland_client::{Connection, Dispatch, Proxy, QueueHandle, protocol::wl_registry};
 
 use crate::river::{
     river_node_v1::RiverNodeV1,
@@ -43,7 +43,7 @@ mod river {
 #[derive(Debug, Clone, Copy)]
 enum Action {
     None,
-    SpawnFoot,
+    SpawnKitty,
     Close,
     FocusNext,
     Move,
@@ -265,7 +265,7 @@ impl WindowManager {
 
         for seat in self.seats.values_mut() {
             if seat.new {
-                seat.create_xkb_binding(river_xkb, qh, mods, SPACE, Action::SpawnFoot);
+                seat.create_xkb_binding(river_xkb, qh, mods, SPACE, Action::SpawnKitty);
                 seat.create_xkb_binding(river_xkb, qh, mods, Q, Action::Close);
                 seat.create_xkb_binding(river_xkb, qh, mods, N, Action::FocusNext);
                 seat.create_xkb_binding(river_xkb, qh, mods, ESC, Action::Exit);
@@ -405,7 +405,7 @@ impl Seat {
             Action::None => {}
             // Don't pass WAYLAND_DEBUG on to children, the added noise makes
             // debugging the window manager itself impractical.
-            Action::SpawnFoot => match std::process::Command::new("foot")
+            Action::SpawnKitty => match std::process::Command::new("kitty")
                 .env_remove("WAYLAND_DEBUG")
                 .spawn()
             {

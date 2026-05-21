@@ -6,5 +6,6 @@ pkgs.mkShell {
     rust-analyzer
     rustfmt
     clippy
+    river
   ];
 }
