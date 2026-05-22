@@ -11,5 +11,6 @@ pkgs.mkShell {
     river
     taplo
     treefmt
+    wev
   ];
 }
