@@ -2,6 +2,7 @@
 name = "narisha"
 version = "1.0.0"
 edition = "2024"
+license = "GPL-3.0"
 
 [dependencies]
 bitflags = "2.11.0"
