@@ -1,4 +1,4 @@
-# Narisha
+# Narisha [WIP]
 Le README servira de projet le temps de migrer sur Forgejo
 
 # TODO
