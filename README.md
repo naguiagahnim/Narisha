@@ -12,6 +12,7 @@ Le README servira de projet le temps de migrer sur Forgejo
 - Animations, shaders
 - Effets sonores
 - Enlever la barre de titre pour les fenêtres, c'est pas beau
+- Support captures d'écran / screenshare
 
 ## Encore moins important
 - Déserialization fichiers de configuration
