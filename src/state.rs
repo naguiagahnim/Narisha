@@ -4,6 +4,8 @@ use wayland_backend::client::ObjectId;
 use wayland_client::QueueHandle;
 
 use crate::river::{
+    river_layer_shell_output_v1::RiverLayerShellOutputV1,
+    river_layer_shell_v1::RiverLayerShellV1,
     river_node_v1::RiverNodeV1,
     river_output_v1::RiverOutputV1,
     river_pointer_binding_v1::RiverPointerBindingV1,
@@ -22,6 +24,7 @@ use crate::wm::actions::SeatOp;
 pub struct AppData {
     pub river_wm: Option<RiverWindowManagerV1>,
     pub river_xkb: Option<RiverXkbBindingsV1>,
+    pub river_layershell: Option<RiverLayerShellV1>,
     pub wm: WindowManager,
 }
 
@@ -41,7 +44,11 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(proxy: RiverWindowV1, qh: &QueueHandle<AppData>, (x, y): (i32, i32)) -> Self {
+    pub fn new(
+        proxy: RiverWindowV1,
+        qh: &QueueHandle<AppData>,
+        (x, y, width, height): (i32, i32, i32, i32),
+    ) -> Self {
         let node = proxy.get_node(qh, ());
         Window {
             proxy,
@@ -50,8 +57,8 @@ impl Window {
             closed: false,
             x,
             y,
-            width: 0,
-            height: 0,
+            width,
+            height,
             pointer_move_requested: None,
             pointer_resize_requested: None,
             pointer_resize_requested_edges: Edges::None,
@@ -69,6 +76,8 @@ impl Window {
 pub struct Output {
     pub proxy: RiverOutputV1,
     pub removed: bool,
+    pub layer_shell_output: Option<RiverLayerShellOutputV1>,
+    pub workarea: Option<(i32, i32, i32, i32)>,
 }
 
 impl Output {
@@ -76,6 +85,8 @@ impl Output {
         Self {
             proxy,
             removed: false,
+            layer_shell_output: None,
+            workarea: None,
         }
     }
 }

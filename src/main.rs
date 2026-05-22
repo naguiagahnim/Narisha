@@ -22,6 +22,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("river_xkb_bindings_v1 global not found! Is river running with xkb support?");
         std::process::exit(1);
     }
+    if app_data.river_layershell.is_none() {
+        eprintln!(
+            "river_layer_shell_v1 global not found! Is river running with layershell support?"
+        );
+        std::process::exit(1);
+    }
 
     loop {
         event_queue.blocking_dispatch(&mut app_data)?;

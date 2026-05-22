@@ -1,11 +1,13 @@
 use wayland_backend::client::ObjectId;
 use wayland_client::{Connection, Dispatch, Proxy, QueueHandle, protocol::wl_registry};
 
+use crate::river::river_layer_shell_output_v1::RiverLayerShellOutputV1;
 use crate::river::{
-    river_node_v1::RiverNodeV1, river_output_v1::RiverOutputV1,
-    river_pointer_binding_v1::RiverPointerBindingV1, river_seat_v1::RiverSeatV1,
-    river_window_manager_v1::RiverWindowManagerV1, river_window_v1::RiverWindowV1,
-    river_xkb_binding_v1::RiverXkbBindingV1, river_xkb_bindings_v1::RiverXkbBindingsV1,
+    river_layer_shell_v1::RiverLayerShellV1, river_node_v1::RiverNodeV1,
+    river_output_v1::RiverOutputV1, river_pointer_binding_v1::RiverPointerBindingV1,
+    river_seat_v1::RiverSeatV1, river_window_manager_v1::RiverWindowManagerV1,
+    river_window_v1::RiverWindowV1, river_xkb_binding_v1::RiverXkbBindingV1,
+    river_xkb_bindings_v1::RiverXkbBindingsV1,
 };
 use crate::state::{AppData, Output, Seat, Window};
 
@@ -26,6 +28,7 @@ impl Dispatch<wl_registry::WlRegistry, ()> for AppData {
         {
             const RIVER_WINDOW_MANAGER_V1_VERSION: u32 = 4;
             const RIVER_XKB_BINDINGS_V1_VERSION: u32 = 1;
+            const RIVER_LAYER_SHELL_V1_VERSION: u32 = 1;
             match interface.as_str() {
                 "river_window_manager_v1" => {
                     if version < RIVER_WINDOW_MANAGER_V1_VERSION {
@@ -51,6 +54,21 @@ impl Dispatch<wl_registry::WlRegistry, ()> for AppData {
                     state.river_xkb = Some(registry.bind::<RiverXkbBindingsV1, _, _>(
                         name,
                         RIVER_XKB_BINDINGS_V1_VERSION,
+                        qh,
+                        (),
+                    ));
+                }
+
+                "river_layer_shell_v1" => {
+                    if version < RIVER_LAYER_SHELL_V1_VERSION {
+                        eprintln!(
+                            "Server river_layer_shell_v1 v{version}, but we need at least v{RIVER_LAYER_SHELL_V1_VERSION}"
+                        );
+                        std::process::exit(1);
+                    }
+                    state.river_layershell = Some(registry.bind::<RiverLayerShellV1, _, _>(
+                        name,
+                        RIVER_LAYER_SHELL_V1_VERSION,
                         qh,
                         (),
                     ));
@@ -88,11 +106,19 @@ impl Dispatch<RiverWindowManagerV1, ()> for AppData {
             Event::SessionLocked => {}
             Event::SessionUnlocked => {}
             Event::Window { id } => {
-                let position = state.wm.compute_new_window_position();
-                state.wm.windows.push_back(Window::new(id, qh, position));
+                let geometry = state.wm.compute_new_window_geometry();
+                state.wm.windows.push_back(Window::new(id, qh, geometry));
             }
             Event::Output { id } => {
-                state.wm.outputs.insert(id.id(), Output::new(id));
+                if let Some(layer_shell) = &state.river_layershell {
+                    let layer_shell_output: RiverLayerShellOutputV1 =
+                        layer_shell.get_output(&id, qh, ());
+                    let mut output = Output::new(id);
+                    output.layer_shell_output = Some(layer_shell_output);
+                    state.wm.outputs.insert(output.proxy.id(), output);
+                } else {
+                    state.wm.outputs.insert(id.id(), Output::new(id));
+                }
             }
             Event::Seat { id } => {
                 state.wm.seats.insert(id.id(), Seat::new(id));
@@ -199,6 +225,34 @@ impl Dispatch<RiverXkbBindingV1, ObjectId> for AppData {
     }
 }
 
+impl Dispatch<RiverLayerShellOutputV1, ()> for AppData {
+    fn event(
+        state: &mut Self,
+        proxy: &RiverLayerShellOutputV1,
+        event: <RiverLayerShellOutputV1 as Proxy>::Event,
+        _data: &(),
+        _conn: &Connection,
+        _qh: &QueueHandle<Self>,
+    ) {
+        use crate::river::river_layer_shell_output_v1::Event;
+        let Event::NonExclusiveArea {
+            x,
+            y,
+            width,
+            height,
+        } = event;
+
+        if let Some(output) = state.wm.outputs.values_mut().find(|o| {
+            o.layer_shell_output
+                .as_ref()
+                .map(|l: &RiverLayerShellOutputV1| l.id() == proxy.id())
+                .unwrap_or(false)
+        }) {
+            output.workarea = Some((x, y, width, height));
+        }
+    }
+}
+
 impl Dispatch<RiverPointerBindingV1, ObjectId> for AppData {
     fn event(
         state: &mut Self,
@@ -222,3 +276,4 @@ impl Dispatch<RiverPointerBindingV1, ObjectId> for AppData {
 
 wayland_client::delegate_noop!(AppData: ignore RiverXkbBindingsV1);
 wayland_client::delegate_noop!(AppData: ignore RiverNodeV1);
+wayland_client::delegate_noop!(AppData: ignore RiverLayerShellV1);

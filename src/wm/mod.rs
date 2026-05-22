@@ -63,16 +63,30 @@ impl WindowManager {
         proxy.manage_finish();
     }
 
-    pub fn compute_new_window_position(&self) -> (i32, i32) {
+    pub fn compute_new_window_geometry(&self) -> (i32, i32, i32, i32) {
+        let workarea = self
+            .outputs
+            .values()
+            .find_map(|o| o.workarea)
+            .unwrap_or((0, 0, 1920, 1080));
+
+        let (wx, wy, ww, wh) = workarea;
+        let width = ww * 2 / 3;
+        let height = wh * 2 / 3;
+
         for seat in self.seats.values() {
             if let Some(focused_proxy) = &seat.focused
                 && let Some(window) = self.windows.iter().find(|w| &w.proxy == focused_proxy)
             {
-                return (window.x + window.width, window.y);
+                return (window.x + window.width, window.y, width, height);
             }
         }
-        (0, 0)
+
+        let x = wx + (ww - width) / 2;
+        let y = wy + (wh - height) / 2;
+        (x, y, width, height)
     }
+
     pub fn handle_render_start(&mut self, proxy: &RiverWindowManagerV1) {
         for seat in self.seats.values_mut() {
             match &seat.op {
