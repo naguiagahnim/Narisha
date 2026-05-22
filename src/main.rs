@@ -1,3 +1,4 @@
+mod config;
 mod dispatch;
 mod river;
 mod state;

@@ -3,17 +3,20 @@ use std::collections::HashMap;
 use wayland_backend::client::ObjectId;
 use wayland_client::QueueHandle;
 
-use crate::river::{
-    river_layer_shell_output_v1::RiverLayerShellOutputV1,
-    river_layer_shell_v1::RiverLayerShellV1,
-    river_node_v1::RiverNodeV1,
-    river_output_v1::RiverOutputV1,
-    river_pointer_binding_v1::RiverPointerBindingV1,
-    river_seat_v1::RiverSeatV1,
-    river_window_manager_v1::RiverWindowManagerV1,
-    river_window_v1::{Edges, RiverWindowV1},
-    river_xkb_binding_v1::RiverXkbBindingV1,
-    river_xkb_bindings_v1::RiverXkbBindingsV1,
+use crate::{
+    config::Config,
+    river::{
+        river_layer_shell_output_v1::RiverLayerShellOutputV1,
+        river_layer_shell_v1::RiverLayerShellV1,
+        river_node_v1::RiverNodeV1,
+        river_output_v1::RiverOutputV1,
+        river_pointer_binding_v1::RiverPointerBindingV1,
+        river_seat_v1::RiverSeatV1,
+        river_window_manager_v1::RiverWindowManagerV1,
+        river_window_v1::{Edges, RiverWindowV1},
+        river_xkb_binding_v1::RiverXkbBindingV1,
+        river_xkb_bindings_v1::RiverXkbBindingsV1,
+    },
 };
 
 use crate::wm::WindowManager;
@@ -26,6 +29,7 @@ pub struct AppData {
     pub river_xkb: Option<RiverXkbBindingsV1>,
     pub river_layershell: Option<RiverLayerShellV1>,
     pub wm: WindowManager,
+    pub config: Config,
 }
 
 #[derive(Debug)]
