@@ -87,7 +87,10 @@ impl Dispatch<RiverWindowManagerV1, ()> for AppData {
             Event::RenderStart => state.wm.handle_render_start(proxy),
             Event::SessionLocked => {}
             Event::SessionUnlocked => {}
-            Event::Window { id } => state.wm.windows.push_back(Window::new(id, qh)),
+            Event::Window { id } => {
+                println!("Window ajoutée");
+                state.wm.windows.push_back(Window::new(id, qh))
+            }
             Event::Output { id } => {
                 state.wm.outputs.insert(id.id(), Output::new(id));
             }

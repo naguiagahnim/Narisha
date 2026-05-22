@@ -25,9 +25,6 @@ pub enum SeatOp {
         start_x: i32,
         start_y: i32,
     },
-    Spawn {
-        window_proxy: RiverWindowV1,
-    },
     Resize {
         window_proxy: RiverWindowV1,
         start_x: i32,

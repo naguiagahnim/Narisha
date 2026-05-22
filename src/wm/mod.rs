@@ -76,7 +76,6 @@ impl WindowManager {
                         window.set_position(start_x + seat.op_dx, start_y + seat.op_dy);
                     }
                 }
-                SeatOp::Spawn { window_proxy } => {}
                 SeatOp::Resize {
                     window_proxy,
                     start_x,
