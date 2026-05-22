@@ -41,15 +41,15 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(proxy: RiverWindowV1, qh: &QueueHandle<AppData>) -> Self {
+    pub fn new(proxy: RiverWindowV1, qh: &QueueHandle<AppData>, (x, y): (i32, i32)) -> Self {
         let node = proxy.get_node(qh, ());
         Window {
             proxy,
             node,
             new: true,
             closed: false,
-            x: 0,
-            y: 0,
+            x,
+            y,
             width: 0,
             height: 0,
             pointer_move_requested: None,

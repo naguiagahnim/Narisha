@@ -4,6 +4,7 @@ Le README servira de projet le temps de migrer sur Forgejo
 # TODO
 ## Plus important
 - Gestion des fenêtres (scrolling)
+  - Ça inclut, s'adapter aux layer shell par exemple, ne pas avoir de barre noire en dessous
 - Keybinds
 
 ## Moins important

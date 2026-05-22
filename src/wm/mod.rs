@@ -34,6 +34,7 @@ enum Keys {
     Space = 0x20,
     N = 0x6e,
     Q = 0x71,
+    C = 0x63,
     Esc = 0xff1b,
     Left = 0xff51,
     Right = 0xff53,
@@ -62,6 +63,16 @@ impl WindowManager {
         proxy.manage_finish();
     }
 
+    pub fn compute_new_window_position(&self) -> (i32, i32) {
+        for seat in self.seats.values() {
+            if let Some(focused_proxy) = &seat.focused
+                && let Some(window) = self.windows.iter().find(|w| &w.proxy == focused_proxy)
+            {
+                return (window.x + window.width, window.y);
+            }
+        }
+        (0, 0)
+    }
     pub fn handle_render_start(&mut self, proxy: &RiverWindowManagerV1) {
         for seat in self.seats.values_mut() {
             match &seat.op {
@@ -168,7 +179,7 @@ impl WindowManager {
                     Keys::Space as u32,
                     Action::Spawn(vec!["kitty".to_string()]),
                 );
-                seat.create_xkb_binding(river_xkb, qh, mods, Keys::Q as u32, Action::Close);
+                seat.create_xkb_binding(river_xkb, qh, mods, Keys::C as u32, Action::Close);
                 seat.create_xkb_binding(
                     river_xkb,
                     qh,
