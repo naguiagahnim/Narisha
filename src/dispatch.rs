@@ -2,6 +2,9 @@ use wayland_backend::client::ObjectId;
 use wayland_client::{Connection, Dispatch, Proxy, QueueHandle, protocol::wl_registry};
 
 use crate::river::river_layer_shell_output_v1::RiverLayerShellOutputV1;
+use crate::river::river_xkb_config_v1::RiverXkbConfigV1;
+use crate::river::river_xkb_keyboard_v1::RiverXkbKeyboardV1;
+use crate::river::river_xkb_keymap_v1::RiverXkbKeymapV1;
 use crate::river::{
     river_layer_shell_v1::RiverLayerShellV1, river_node_v1::RiverNodeV1,
     river_output_v1::RiverOutputV1, river_pointer_binding_v1::RiverPointerBindingV1,
@@ -52,6 +55,20 @@ impl Dispatch<wl_registry::WlRegistry, ()> for AppData {
                         std::process::exit(1);
                     }
                     state.river_xkb = Some(registry.bind::<RiverXkbBindingsV1, _, _>(
+                        name,
+                        RIVER_XKB_BINDINGS_V1_VERSION,
+                        qh,
+                        (),
+                    ));
+                }
+                "river_xkb_config_v1" => {
+                    if version < RIVER_XKB_BINDINGS_V1_VERSION {
+                        eprintln!(
+                            "Server supports river_xkb_config_v1 v{version}, but we need at least v{RIVER_XKB_BINDINGS_V1_VERSION}"
+                        );
+                        std::process::exit(1);
+                    }
+                    state.river_xkb_config = Some(registry.bind::<RiverXkbConfigV1, _, _>(
                         name,
                         RIVER_XKB_BINDINGS_V1_VERSION,
                         qh,
@@ -274,6 +291,28 @@ impl Dispatch<RiverPointerBindingV1, ObjectId> for AppData {
     }
 }
 
+impl Dispatch<RiverXkbConfigV1, ()> for AppData {
+    fn event(
+        state: &mut Self,
+        _proxy: &RiverXkbConfigV1,
+        event: <RiverXkbConfigV1 as Proxy>::Event,
+        _data: &(),
+        _conn: &Connection,
+        qh: &QueueHandle<Self>,
+    ) {
+        use crate::river::river_xkb_config_v1::Event;
+        if let Event::XkbKeyboard { id } = event {
+            state.xkb_keyboards.push(id);
+        }
+    }
+
+    wayland_client::event_created_child!(AppData, RiverXkbConfigV1, [
+        crate::river::river_xkb_config_v1::EVT_XKB_KEYBOARD_OPCODE => (RiverXkbKeyboardV1, ())
+    ]);
+}
+
 wayland_client::delegate_noop!(AppData: ignore RiverXkbBindingsV1);
 wayland_client::delegate_noop!(AppData: ignore RiverNodeV1);
 wayland_client::delegate_noop!(AppData: ignore RiverLayerShellV1);
+wayland_client::delegate_noop!(AppData: ignore RiverXkbKeyboardV1);
+wayland_client::delegate_noop!(AppData: ignore RiverXkbKeymapV1);

@@ -19,8 +19,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("river_window_manager_v1 global not found! Is river running?");
         std::process::exit(1);
     }
-    if app_data.river_xkb.is_none() {
-        eprintln!("river_xkb_bindings_v1 global not found! Is river running with xkb support?");
+    if app_data.river_xkb.is_none() || app_data.river_xkb_config.is_none() {
+        eprintln!(
+            "river_xkb_<bindings/config>_v1 global not found! Is river running with xkb support?"
+        );
         std::process::exit(1);
     }
     if app_data.river_layershell.is_none() {

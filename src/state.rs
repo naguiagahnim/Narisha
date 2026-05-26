@@ -16,6 +16,8 @@ use crate::{
         river_window_v1::{Edges, RiverWindowV1},
         river_xkb_binding_v1::RiverXkbBindingV1,
         river_xkb_bindings_v1::RiverXkbBindingsV1,
+        river_xkb_config_v1::RiverXkbConfigV1,
+        river_xkb_keyboard_v1::RiverXkbKeyboardV1,
     },
 };
 
@@ -28,6 +30,8 @@ pub struct AppData {
     pub river_wm: Option<RiverWindowManagerV1>,
     pub river_xkb: Option<RiverXkbBindingsV1>,
     pub river_layershell: Option<RiverLayerShellV1>,
+    pub river_xkb_config: Option<RiverXkbConfigV1>,
+    pub xkb_keyboards: Vec<RiverXkbKeyboardV1>,
     pub wm: WindowManager,
     pub config: Config,
 }
