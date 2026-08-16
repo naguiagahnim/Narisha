@@ -3,9 +3,11 @@ SPDX-FileCopyrightText: © 2026 Agahnim
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Narisha
+# [WIP] Narisha
 
 A tiling window manager for River
+
+**WIP software, use at your own risk !**
 
 ## Dependencies
 
