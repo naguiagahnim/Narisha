@@ -1,16 +1,33 @@
-# Narisha [WIP]
-Le README servira de projet le temps de migrer sur Forgejo
+<!--
+SPDX-FileCopyrightText: © 2026 Agahnim
+SPDX-License-Identifier: GPL-3.0-only
+-->
 
-# TODO
-## Plus important
-- Gestion des fenêtres (scrolling)
-  - Ça inclut, s'adapter aux layer shell par exemple, ne pas avoir de barre noire en dessous
-  - Gestion des multiples écrans, spawn fenêtre sur écran focus
-- Keybinds
-- Déserialization fichiers de configuration
+# Narisha
 
-## Moins important
-- Animations, shaders
-- Effets sonores
-- Enlever la barre de titre pour les fenêtres, c'est pas beau
-- Support captures d'écran / screenshare
+A tiling window manager for River
+
+## Dependencies
+
+The following system dependencies are required:
+
+- pkg-config / u-config
+- meson / muon
+- ninja / samurai
+- wayland
+- xkbcommon
+
+The "development" versions are required if applicable to your distribution.
+
+## Building
+
+```sh
+{ meson | muon } setup build
+{ ninja | samu } -C build
+```
+
+## Running
+
+```
+river -c ./build/narisha
+```
