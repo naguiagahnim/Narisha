@@ -45,7 +45,7 @@ struct Window {
 
 enum Action {
 	ACTION_NONE,
-	ACTION_SPAWN_FOOT,
+	ACTION_SPAWN_WEZTERM,
 	ACTION_CLOSE,
 	ACTION_FOCUS_NEXT,
 	ACTION_MOVE,
@@ -430,9 +430,9 @@ static void seat_action(struct Seat *seat, enum Action action) {
 	switch (action) {
 	case ACTION_NONE:
 		break;
-	case ACTION_SPAWN_FOOT:
+	case ACTION_SPAWN_WEZTERM:
 		if (fork() == 0) {
-			execlp("foot", "foot", (char *)0);
+			execlp("wezterm", "wezterm", (char *)0);
 		}
 		break;
 	case ACTION_CLOSE:
@@ -467,8 +467,8 @@ static void seat_action(struct Seat *seat, enum Action action) {
 static void seat_manage(struct Seat *seat) {
 	if (seat->new) {
 		seat->new = false;
-		const uint32_t super = RIVER_SEAT_V1_MODIFIERS_MOD4;
-		xkb_binding_create(seat, super, XKB_KEY_space, ACTION_SPAWN_FOOT);
+		const uint32_t super = RIVER_SEAT_V1_MODIFIERS_MOD1;
+		xkb_binding_create(seat, super, XKB_KEY_space, ACTION_SPAWN_WEZTERM);
 		xkb_binding_create(seat, super, XKB_KEY_q, ACTION_CLOSE);
 		xkb_binding_create(seat, super, XKB_KEY_n, ACTION_FOCUS_NEXT);
 		xkb_binding_create(seat, super, XKB_KEY_Escape, ACTION_EXIT);
