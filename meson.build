@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: © 2026 Agahnim
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: GPL-3.0-only
 
 project(
   'narisha',
