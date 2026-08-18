@@ -15,6 +15,7 @@
 #include <river-xkb-bindings-v1-client-protocol.h>
 
 #include <linux/input-event-codes.h>
+#include <wayland-util.h>
 #include <xkbcommon/xkbcommon.h>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
@@ -25,6 +26,16 @@ struct Output {
 	struct river_output_v1 *obj;
 	bool removed;
 	struct wl_list link; // WindowManager.outputs
+
+	int width;
+	int height;
+	int x;
+	int y;
+};
+
+enum Layout {
+	Monocle,
+	Master,
 };
 
 struct Window {
@@ -122,10 +133,21 @@ static void output_handle_removed(void *data, struct river_output_v1 *obj) {
 	output->removed = true;
 }
 
+
+static void output_handle_dimensions(void *data, struct river_output_v1 *obj, int32_t width, int32_t height) {
+	struct Output *output = data;
+	output->width = width;
+	output->height = height;
+}
+
+static void output_handle_position(void *data, struct river_output_v1 *obj, int32_t x, int32_t y) {
+	struct Output *output = data;
+	output->x = x;
+	output->y = y;
+}
+
 // Ignored events
 static void output_handle_wl_output(void *data, struct river_output_v1 *obj, uint32_t name) {}
-static void output_handle_position(void *data, struct river_output_v1 *obj, int32_t x, int32_t y) {}
-static void output_handle_dimensions(void *data, struct river_output_v1 *obj, int32_t width, int32_t height) {}
 
 const struct river_output_v1_listener river_output_listener = {
 	.removed = output_handle_removed,
@@ -236,11 +258,28 @@ static void window_set_position(struct Window *window, int32_t x, int32_t y) {
 static void seat_pointer_move(struct Seat *seat, struct Window *window);
 static void seat_pointer_resize(struct Seat *seat, struct Window *window, uint32_t edges);
 
+static void calculate_window_geometry(enum Layout *layout, struct Window *window, struct Output *output, int32_t gaps) {
+	if (layout == Monocle) {
+		int32_t x = output->x + gaps;
+		int32_t y = output->y + gaps;
+		window_set_position(window, x, y);
+
+		int32_t width = output->width - (gaps * 2);
+		int32_t height = output->height - (gaps * 2);
+		river_window_v1_propose_dimensions(window->obj, width, height);
+	}
+}
+
 static void window_manage(struct Window *window) {
 	if (window->new) {
 		window->new = false;
-		window_set_position(window, 0, 0);
-		river_window_v1_propose_dimensions(window->obj, 0, 0);
+		if (!wl_list_empty(&wm.outputs)) {
+	    struct Output *output = wl_container_of(wm.outputs.next, output, link);      
+      calculate_window_geometry(Monocle, window, output, gaps);
+    } else {
+	    window_set_position(window, 0, 0);
+      river_window_v1_propose_dimensions(window->obj, 0, 0);
+    };
 	}
 	if (window->pointer_move_requested != NULL) {
 		seat_pointer_move(window->pointer_move_requested, window);

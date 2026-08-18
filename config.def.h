@@ -1,8 +1,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdint.h>
 #include <stdio.h>
 
+// The gaps surrounding the clients
+static const int32_t gaps = 50;
 
 // Use this to define your terminal command
 // All command vectors follow the same logic
