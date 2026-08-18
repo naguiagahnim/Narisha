@@ -18,6 +18,9 @@
 #include <xkbcommon/xkbcommon.h>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
+#include "config.h"
+#include "types.h"
+
 struct Output {
 	struct river_output_v1 *obj;
 	bool removed;
@@ -45,7 +48,7 @@ struct Window {
 
 enum Action {
 	ACTION_NONE,
-	ACTION_SPAWN_WEZTERM,
+	ACTION_SPAWN,
 	ACTION_CLOSE,
 	ACTION_FOCUS_NEXT,
 	ACTION_MOVE,
@@ -58,6 +61,7 @@ struct XkbBinding {
 	struct Seat *seat;
 	enum Action action;
 	struct wl_list link;
+	Arg arg;
 };
 
 struct PointerBinding {
@@ -65,6 +69,7 @@ struct PointerBinding {
 	struct Seat *seat;
 	enum Action action;
 	struct wl_list link;
+	Arg arg;
 };
 
 enum SeatOp {
@@ -95,6 +100,8 @@ struct Seat {
 	// For SEAT_OP_RESIZE only
 	int32_t op_start_width, op_start_height;
 	uint32_t op_edges;
+
+	Arg pending_arg;
 
 	struct wl_list link; // WindowManager.seats
 };
@@ -430,9 +437,9 @@ static void seat_action(struct Seat *seat, enum Action action) {
 	switch (action) {
 	case ACTION_NONE:
 		break;
-	case ACTION_SPAWN_WEZTERM:
+	case ACTION_SPAWN:
 		if (fork() == 0) {
-			execlp("wezterm", "wezterm", (char *)0);
+			execvp(termcmd[0], (char **)termcmd);
 		}
 		break;
 	case ACTION_CLOSE:
@@ -468,7 +475,7 @@ static void seat_manage(struct Seat *seat) {
 	if (seat->new) {
 		seat->new = false;
 		const uint32_t super = RIVER_SEAT_V1_MODIFIERS_MOD1;
-		xkb_binding_create(seat, super, XKB_KEY_space, ACTION_SPAWN_WEZTERM);
+		xkb_binding_create(seat, super, XKB_KEY_space, ACTION_SPAWN);
 		xkb_binding_create(seat, super, XKB_KEY_q, ACTION_CLOSE);
 		xkb_binding_create(seat, super, XKB_KEY_n, ACTION_FOCUS_NEXT);
 		xkb_binding_create(seat, super, XKB_KEY_Escape, ACTION_EXIT);

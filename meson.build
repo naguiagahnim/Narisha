@@ -27,6 +27,15 @@ generated = wl_mod.scan_xml(
   'protocol/river-xkb-bindings-v1.xml',
 )
 
+fs = import('fs')
+if not fs.exists('config.h')
+    configure_file(
+        input: 'config.def.h',
+        output: 'config.h',
+        copy: true
+    )
+endif
+
 exe = executable(
   'narisha',
   'narisha.c',
