@@ -7,6 +7,10 @@
 // The gaps surrounding the clients
 static const int32_t gaps = 50;
 
+static const char *const autostart[] = {
+  "swaybg", "-i", "~/Images/Wallpapers/fiswordhd.png", NULL
+};
+
 // Use this to define your terminal command
 // All command vectors follow the same logic
 // static const char *termcmd[] = { "st-wl", "an-arg", "why-not-another-arg", NULL} ;

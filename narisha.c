@@ -13,6 +13,7 @@
 #include <wayland-client-protocol.h>
 #include <river-window-management-v1-client-protocol.h>
 #include <river-xkb-bindings-v1-client-protocol.h>
+#include <river-layer-shell-v1-client-protocol.h>
 
 #include <linux/input-event-codes.h>
 #include <wayland-util.h>
@@ -258,7 +259,7 @@ static void window_set_position(struct Window *window, int32_t x, int32_t y) {
 static void seat_pointer_move(struct Seat *seat, struct Window *window);
 static void seat_pointer_resize(struct Seat *seat, struct Window *window, uint32_t edges);
 
-static void calculate_window_geometry(enum Layout *layout, struct Window *window, struct Output *output, int32_t gaps) {
+static void calculate_window_geometry(enum Layout layout, struct Window *window, struct Output *output, int32_t gaps) {
 	if (layout == Monocle) {
 		int32_t x = output->x + gaps;
 		int32_t y = output->y + gaps;
@@ -712,6 +713,25 @@ static const struct wl_registry_listener registry_listener = {
 	.global_remove = handle_global_remove,
 };
 
+static void run_autostart(void) {
+	if (autostart[0] == NULL) {
+		return ;
+	}
+
+	for (int i = 0; autostart[i] != NULL; ) {
+	  if (fork() == 0) {
+	      execvp(autostart[i], (char **)&autostart[i]);
+	      perror("autostart execution failed");
+	      exit(1);
+	  }
+	  while (autostart[i] != NULL) {
+	      i++;
+	  }
+	  i++;
+	}
+	return ;
+}
+
 int main(void) {
 	struct wl_display *display = wl_display_connect(NULL);
 	if (display == NULL) {
@@ -743,6 +763,8 @@ int main(void) {
 	wm_init();
 
 	river_window_manager_v1_add_listener(window_manager_v1, &wm_listener, NULL);
+
+	run_autostart();
 
 	while (true) {
 		if (wl_display_dispatch(display) < 0) {
