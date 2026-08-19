@@ -8,7 +8,7 @@
 static const int32_t gaps = 50;
 
 static const char *const autostart[] = {
-  "swaybg", "-i", "mywallpaper", NULL
+  "swaybg", "-i", "/etc/greetd/quickshell-greeter/assets/images/fullmap.png", NULL
 };
 
 // Use this to define your terminal command
