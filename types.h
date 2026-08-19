@@ -1,5 +1,9 @@
 // SPDX-FileCopyrightText: © 2026 Agahnim
 // SPDX-License-Identifier: GPL-3.0-only
+//
+
+#ifndef TYPES_H
+#define TYPES_H
 
 #include <stdbool.h>
 #include <wayland-util.h>
@@ -111,3 +115,5 @@ struct WindowManager {
   struct wl_list windows; // Window
   struct wl_list seats;   // Seat
 };
+
+#endif
