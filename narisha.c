@@ -708,8 +708,10 @@ int main(void) {
     return 1;
   }
 
-  if (window_manager_v1 == NULL || xkb_bindings_v1 == NULL) {
-    fprintf(stderr, "river_window_manager_v1 or river_xkb_bindings_v1 "
+  if (window_manager_v1 == NULL || xkb_bindings_v1 == NULL ||
+      layer_shell_v1 == NULL) {
+    fprintf(stderr, "river_window_manager_v1 or river_xkb_bindings_v1 or "
+                    "river_layer_shell_v1 "
                     "not supported by the Wayland server\n");
     return 1;
   }
